@@ -1,0 +1,72 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id               String             @id @default(uuid())
+  createdAt        DateTime           @default(now())
+  updatedAt        DateTime           @default(now())
+  name             String
+  nickname         String?            @unique
+  email            String             @unique
+  password         String
+  shirtNumber      String?
+  position         String?
+  cellphone        String?
+  birthDate        String?
+  googleId         String?
+  appleId          String?
+  UserPickupSoccer UserPickupSoccer[]
+  PickupSoccer     PickupSoccer[]
+  AvatarHeader     AvatarHeader[]
+
+  @@map("users")
+}
+
+model PickupSoccer {
+  id               String             @id @default(uuid())
+  createdAt        DateTime           @default(now())
+  updatedAt        DateTime           @default(now())
+  createdBy        String             @unique
+  name             String
+  time             String
+  local            String
+  status           Boolean
+  field            String
+  User             User               @relation(fields: [createdBy], references: [id])
+  UserPickupSoccer UserPickupSoccer[]
+  AvatarHeader     AvatarHeader[]
+
+  @@map("pickup_soccers")
+}
+
+model UserPickupSoccer {
+  id             String       @id @default(uuid())
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @default(now())
+  userId         String
+  pickupSoccerId String
+  User           User         @relation(fields: [userId], references: [id])
+  PickupSoccer   PickupSoccer @relation(fields: [pickupSoccerId], references: [id])
+
+  @@map("users_pickup_soccer")
+}
+
+model AvatarHeader {
+  id             String        @id @default(uuid())
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @default(now())
+  userId         String?
+  pickupSoccerId String?
+  avatarUrl      String?
+  headerUrl      String?
+  User           User?         @relation(fields: [userId], references: [id])
+  PickupSoccer   PickupSoccer? @relation(fields: [pickupSoccerId], references: [id])
+
+  @@map("avatar_headers")
+}
