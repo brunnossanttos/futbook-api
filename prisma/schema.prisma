@@ -32,13 +32,13 @@ model PickupSoccer {
   id               String             @id @default(uuid())
   createdAt        DateTime           @default(now())
   updatedAt        DateTime           @default(now())
-  createdBy        String             @unique
+  createdBy        String
   name             String
   time             String
   local            String
   status           Boolean
   field            String
-  User             User               @relation(fields: [createdBy], references: [id])
+  User             User?              @relation(fields: [createdBy], references: [id])
   UserPickupSoccer UserPickupSoccer[]
   AvatarHeader     AvatarHeader[]
 

@@ -12,7 +12,7 @@ export class UpdatePickupSoccerDto extends PartialType(CreatePickupSoccerDto) {
   local?: string;
 
   @ApiProperty()
-  status?: string;
+  status?: boolean;
 
   @ApiProperty()
   field?: string;

@@ -14,7 +14,7 @@ export class CreatePickupSoccerDto {
   local: string;
 
   @ApiProperty()
-  status: string;
+  status: boolean;
 
   @ApiProperty()
   field: string;
