@@ -15,11 +15,15 @@ import { UpdatePickupSoccerDto } from './dto/update-pickup-soccer.dto';
 import { ApiBody, ApiOperation, ApiQuery, ApiTags } from '@nestjs/swagger';
 import { IPaginationParams } from 'src/shared/domain/pagination-params';
 import { Response } from 'express';
+import { PickupSoccerPlayersService } from './pickup-soccer-players.service';
 
 @ApiTags('Peladas')
 @Controller('pickup-soccer')
 export class PickupSoccerController {
-  constructor(private readonly pickupSoccerService: PickupSoccerService) {}
+  constructor(
+    private readonly pickupSoccerService: PickupSoccerService,
+    private readonly pickupSoccerPlayersService: PickupSoccerPlayersService,
+  ) {}
 
   @Post('/')
   @ApiBody({ type: CreatePickupSoccerDto })
@@ -88,11 +92,45 @@ export class PickupSoccerController {
   }
 
   @Delete(':id')
+  @ApiOperation({
+    summary: 'Deletar pelada pelo id',
+  })
   async remove(@Param('id') id: string, @Res() res: Response) {
     const response = res
       .status(204)
       .json(await this.pickupSoccerService.remove({ id }));
 
     return response;
+  }
+
+  @Post('/user/')
+  @ApiBody({
+    schema: {
+      type: 'object',
+      properties: {
+        userId: { type: 'array', items: { type: 'string' } },
+        pickupSoccerId: { type: 'string' },
+      },
+    },
+  })
+  @ApiOperation({
+    summary: 'Adicionar um usuario a uma pelada pelo id',
+  })
+  async addUserToPickupSoccer(
+    @Body('pickupSoccerId') pickupSoccerId: string,
+    @Body('userId') userIds: string[],
+  ) {
+    return await this.pickupSoccerPlayersService.create(
+      pickupSoccerId,
+      userIds,
+    );
+  }
+
+  @Delete('/user/:id')
+  @ApiOperation({
+    summary: 'Remover um usuario de uma pelada pelo id',
+  })
+  async removeUserFromPickupSoccer(@Param('id') userPickupSoccerId: string) {
+    return await this.pickupSoccerPlayersService.remove(userPickupSoccerId);
   }
 }
