@@ -4,6 +4,7 @@ import { JwtService } from '@nestjs/jwt';
 import { PasswordHashService } from 'src/shared/password-hash.service';
 import { User, UserToken } from '@prisma/client';
 import { PrismaService } from 'src/shared/database/prisma/prisma.service';
+import { CreateUserDto } from '../user/dto/create-user.dto';
 
 interface IPayload {
   sub: string;
@@ -99,5 +100,60 @@ export class AuthService {
       accessToken: newAccessToken,
       refreshToken: newRefreshToken,
     };
+  }
+
+  async socialLogin(createUserDto: CreateUserDto) {
+    if (!createUserDto.googleId && !createUserDto.appleId) {
+      throw new UnauthorizedException(
+        'Google Id not informed or Apple Id not informed',
+      );
+    }
+
+    const user = await this.handleGoogleOrAppleUser(createUserDto);
+
+    const payload = { sub: user.id, email: user.email };
+
+    const accessToken = await this.jwtService.signAsync(payload);
+    const refreshToken = await this.jwtService.signAsync(payload, {
+      expiresIn: '364d',
+    });
+
+    return {
+      accessToken,
+      refreshToken,
+      userId: user.id,
+      createdAt: user.createdAt,
+      googleId: user.googleId,
+      appleId: user.appleId,
+    };
+  }
+
+  async handleGoogleOrAppleUser(createUserDto: CreateUserDto) {
+    let user: User | undefined;
+    if (createUserDto.googleId) {
+      user = await this.prismaService.user.findFirst({
+        where: { googleId: createUserDto.googleId, email: createUserDto.email },
+      });
+
+      if (!user) {
+        user = await this.userService.create(createUserDto);
+      }
+    }
+
+    if (createUserDto.appleId) {
+      user = await this.prismaService.user.findFirst({
+        where: { appleId: createUserDto.appleId, email: createUserDto.email },
+      });
+
+      if (!user) {
+        user = await this.userService.create(createUserDto);
+      }
+    }
+
+    if (!user) {
+      throw new UnauthorizedException('User could not be created or found.');
+    }
+
+    return user;
   }
 }

@@ -3,6 +3,7 @@ import { AuthService } from './auth.service';
 import { ApiBody, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { CreateLoginDto } from './dto/create-login.dto';
 import { RefreshTokenDto } from './dto/refresh-token.dto';
+import { CreateUserDto } from '../user/dto/create-user.dto';
 
 @ApiTags('Auth')
 @Controller('auth')
@@ -29,5 +30,17 @@ export class AuthController {
   })
   async refreshToken(@Body() { refreshToken }: RefreshTokenDto) {
     return await this.authService.refreshToken(refreshToken);
+  }
+
+  @HttpCode(HttpStatus.OK)
+  @Post('social')
+  @ApiBody({ type: CreateUserDto })
+  @ApiOperation({
+    summary: 'Login com Google ou Apple',
+    description:
+      'Essa rota requer um body com os dados para login com Google ou Apple',
+  })
+  async googleSignIn(@Body() createUserDto: CreateUserDto) {
+    return await this.authService.socialLogin(createUserDto);
   }
 }
