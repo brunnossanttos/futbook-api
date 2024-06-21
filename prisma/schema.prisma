@@ -24,6 +24,7 @@ model User {
   UserPickupSoccer UserPickupSoccer[]
   PickupSoccer     PickupSoccer[]
   AvatarHeader     AvatarHeader[]
+  UserToken        UserToken[]
 
   @@map("users")
 }
@@ -69,4 +70,14 @@ model AvatarHeader {
   PickupSoccer   PickupSoccer? @relation(fields: [pickupSoccerId], references: [id])
 
   @@map("avatar_headers")
+}
+
+model UserToken {
+  id          String   @id @default(uuid())
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @default(now())
+  userId      String
+  token       String
+  expiresDate DateTime
+  User        User     @relation(fields: [userId], references: [id])
 }
