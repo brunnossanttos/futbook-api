@@ -21,7 +21,7 @@ export class AuthService {
   async signIn(
     email: string,
     password: string,
-  ): Promise<{ accessToken: string; refreshToken: string }> {
+  ): Promise<{ userId: string; accessToken: string; refreshToken: string }> {
     const user = await this.userService.findOne({ email });
     const validedPassword = await this.hashedService.validatePassword(
       password,
@@ -48,6 +48,7 @@ export class AuthService {
     });
 
     return {
+      userId: user.id,
       accessToken,
       refreshToken,
     };

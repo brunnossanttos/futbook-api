@@ -76,7 +76,10 @@ export class UserService {
   }
 
   async findOne(where: Prisma.UserWhereUniqueInput): Promise<User> {
-    return await this.prismaService.user.findUnique({ where });
+    return await this.prismaService.user.findUnique({
+      where,
+      include: { AvatarHeader: true },
+    });
   }
 
   async update(
