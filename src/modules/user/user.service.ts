@@ -3,7 +3,7 @@ import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { PrismaService } from 'src/shared/database/prisma/prisma.service';
 import { PasswordHashService } from 'src/shared/password-hash.service';
-import { Prisma, User } from '@prisma/client';
+import { AvatarHeader, Prisma, User } from '@prisma/client';
 import { IPaginationParams } from 'src/shared/domain/pagination-params';
 import { PlayerPosition } from 'src/shared/domain/enum-positions';
 
@@ -12,7 +12,7 @@ export class UserService {
   private readonly logger = new Logger(UserService.name);
 
   constructor(
-    private prismaService: PrismaService<User>,
+    private prismaService: PrismaService<User | AvatarHeader>,
 
     private readonly passwordHashedService: PasswordHashService,
   ) {}
@@ -41,6 +41,16 @@ export class UserService {
     };
 
     const user = await this.prismaService.user.create({ data: data });
+
+    const dataAvatarHeader = {
+      userId: user.id,
+      avatarUrl: process.env.AVATAR_URL,
+      headerUrl: process.env.HEADER_URL,
+    };
+
+    await this.prismaService.avatarHeader.create({
+      data: dataAvatarHeader,
+    });
 
     return user;
   }

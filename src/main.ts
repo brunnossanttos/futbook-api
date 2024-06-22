@@ -2,6 +2,7 @@ import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { INestApplication } from '@nestjs/common';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+import * as bodyParser from 'body-parser';
 
 const setupSwagger = (app: INestApplication) => {
   const options = new DocumentBuilder()
@@ -17,6 +18,9 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
   setupSwagger(app);
+
+  app.use(bodyParser.json({ limit: '10mb' }));
+  app.use(bodyParser.urlencoded({ limit: '10mb', extended: true }));
 
   await app.listen(3000);
 }

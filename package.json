@@ -29,6 +29,7 @@
     "@nestjs/platform-express": "^10.0.0",
     "@nestjs/swagger": "^7.3.1",
     "@prisma/client": "^5.15.0",
+    "cloudinary": "^2.2.0",
     "dotenv": "^16.4.5",
     "faker": "^5.5.3",
     "passport": "^0.7.0",
